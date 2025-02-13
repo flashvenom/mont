@@ -72,10 +72,9 @@ def get_demo_quotes():
 def show_quotes_page():
     st.title("Access My Quotes")
     
-    # Debug: Show session state
-    st.write("Debug - Session State:", st.session_state)
-    
     # Initialize session state
+    if 'pending_quotes' not in st.session_state:
+        st.session_state.pending_quotes = {}
     if 'enrollment_step' not in st.session_state:
         st.session_state.enrollment_step = 1
     if 'enrollment_data' not in st.session_state:
@@ -87,86 +86,19 @@ def show_quotes_page():
     
     st.header("Enter Your Quote Reference Number")
     
-    # Store quote_ref in session state to persist between reruns
-    if 'quote_ref_input' not in st.session_state:
-        st.session_state.quote_ref_input = ""
-    
-    quote_ref = st.text_input("Quote Reference Number", 
-                             key="quote_ref_input",
-                             value=st.session_state.quote_ref_input)
-    
-    # Debug: Show current input
-    st.write("Debug - Current quote_ref:", quote_ref)
+    quote_ref = st.text_input("Quote Reference Number")
     
     if st.button("Access Quote"):
-        st.write("Debug - Button clicked")
-        try:
-            # Get application and quotes from database
-            conn = get_db()
-            c = conn.cursor()
-            
-            # First check if application exists
-            c.execute("""
-                SELECT id, quote_ref, first_name, last_name, gender, phone, email, dob, location, address 
-                FROM applications 
-                WHERE quote_ref = ?
-            """, (quote_ref,))
-            application = c.fetchone()
-            
-            # Debug: Show application lookup result
-            st.write("Debug - Application found:", application is not None)
-            if application:
-                st.write("Debug - Application details:", application)
-                
-                # Get quotes for this application
-                c.execute("""
-                    SELECT COUNT(*) FROM quotes WHERE application_id = ?
-                """, (application[0],))
-                
-                quote_count = c.fetchone()[0]
-                st.write("Debug - Quote count:", quote_count)
-                
-                # If no quotes exist, generate them
-                if quote_count == 0:
-                    from db import save_quotes
-                    save_quotes(application[0], get_demo_quotes())
-                    st.write("Debug - Generated new quotes")
-                
-                # Store in session state for plan selection
-                st.session_state.enrollment_data = {
-                    'id': application[0],
-                    'quote_ref': application[1],
-                    'first_name': application[2],
-                    'last_name': application[3],
-                    'gender': application[4],
-                    'phone': application[5],
-                    'email': application[6],
-                    'dob': application[7],
-                    'location': application[8],
-                    'address': application[9],
-                    'quotes': get_demo_quotes()
-                }
-                
-                # Set step to plan selection
-                st.session_state.enrollment_step = 3
-                st.write("Debug - Set enrollment step to 3")
-                
-                # Close connection before switching
-                conn.close()
-                
-                # Switch to enrollment page
-                st.write("Debug - About to switch page")
-                st.switch_page("pages/1_New_Enrollment.py")
-            else:
-                st.error("Quote reference not found. Please check your number and try again.")
-        
-        except Exception as e:
-            st.error(f"An error occurred: {str(e)}")
-            st.write("Error details:", str(e))
-        finally:
-            if 'conn' in locals():
-                conn.close()
-
+        # Simply set up session state and show quotes
+        quotes = get_demo_quotes()
+        st.session_state.enrollment_data = {
+            'quotes': quotes,
+            'quote_ref': quote_ref
+        }
+        st.session_state.pending_quotes[quote_ref] = st.session_state.enrollment_data
+        st.session_state.enrollment_step = 3
+        st.switch_page("pages/1_New_Enrollment.py")
+    
     # Add option to go back
     st.markdown("---")
     if st.button("← Back to Homepage"):

@@ -237,7 +237,8 @@ def show_plan_selection():
     
     # Display stored information
     data = st.session_state.enrollment_data
-    st.caption(f"Quote Reference: {data['quote_ref']}")
+    if 'quote_ref' in data:
+        st.caption(f"Quote Reference: {data['quote_ref']}")
     
     # Coverage details dictionary
     coverage_details = {
