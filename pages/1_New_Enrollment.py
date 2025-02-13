@@ -117,6 +117,11 @@ def show_quote_processing():
     st.subheader("Information Submitted")
     data = st.session_state.enrollment_data
     
+    # Debug info
+    st.write("Debug Info:")
+    st.write("Application ID:", data.get('id'))
+    st.write("Quote Reference:", data.get('quote_ref'))
+    
     col1, col2 = st.columns(2)
     with col1:
         st.write("**Name:**", f"{data['first_name']} {data['last_name']}")
@@ -132,14 +137,16 @@ def show_quote_processing():
     st.info(f"""
     Your quote reference number is: **{data['quote_ref']}**
     
-    Please save this number. You can use it on the homepage to access your quote once it's ready.
-    
-    Your information has been submitted for a quote. Please expect an email within 1-2 business days
-    with your personalized quote information.
+    Please save this number. You'll need it to access your quotes later.
     """)
     
     # For demo purposes, we'll add the real quotes
-    if st.button("Demo: Generate Quote Now"):
+    st.warning("""
+    **Important**: For this demo, you must click the button below to generate quotes. 
+    In a real system, quotes would be generated automatically by the insurance carriers.
+    """)
+    
+    if st.button("Demo: Generate Quote Now", type="primary"):
         example_quotes = [
             {
                 "carrier": "Kaiser Permanente",
@@ -212,7 +219,13 @@ def show_quote_processing():
         # Save quotes to database
         application_id = st.session_state.enrollment_data.get('id')
         if application_id:
-            save_quotes(application_id, example_quotes)
+            try:
+                save_quotes(application_id, example_quotes)
+                st.success(f"Quotes saved to database for application {application_id}")
+            except Exception as e:
+                st.error(f"Error saving quotes: {str(e)}")
+        else:
+            st.error("No application ID found")
         
         # Store in session state for next step
         st.session_state.enrollment_data["quotes"] = example_quotes
