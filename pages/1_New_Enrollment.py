@@ -113,13 +113,75 @@ def show_quote_processing():
     with your personalized quote information.
     """)
     
-    # For demo purposes, we'll add some example quotes
+    # For demo purposes, we'll add the real quotes
     if st.button("Demo: Generate Quote Now"):
         example_quotes = [
-            {"plan": "Basic Plan", "monthly_premium": "$200", "annual_deductible": "$2000"},
-            {"plan": "Standard Plan", "monthly_premium": "$300", "annual_deductible": "$1000"},
-            {"plan": "Premium Plan", "monthly_premium": "$400", "annual_deductible": "$500"}
+            {
+                "carrier": "Kaiser Permanente",
+                "type": "HMO",
+                "plan_name": "Silver HMO D",
+                "network": "Full",
+                "monthly_premium": "$291.10",
+                "cost_per_period": "$68.05",
+                "sort_value": 68.05
+            },
+            {
+                "carrier": "Kaiser Permanente",
+                "type": "HMO",
+                "plan_name": "Silver HMO C",
+                "network": "Full",
+                "monthly_premium": "$310.46",
+                "cost_per_period": "$77.73",
+                "sort_value": 77.73
+            },
+            {
+                "carrier": "Kaiser Permanente",
+                "type": "HMO",
+                "plan_name": "Silver HMO B",
+                "network": "Full",
+                "monthly_premium": "$317.78",
+                "cost_per_period": "$81.39",
+                "sort_value": 81.39
+            },
+            {
+                "carrier": "United Healthcare",
+                "type": "HMO",
+                "plan_name": "Gold HMO B",
+                "network": "Full",
+                "monthly_premium": "$379.17",
+                "cost_per_period": "$112.09",
+                "sort_value": 112.09
+            },
+            {
+                "carrier": "Kaiser Permanente",
+                "type": "HMO",
+                "plan_name": "Gold HMO B",
+                "network": "Full",
+                "monthly_premium": "$391.99",
+                "cost_per_period": "$118.50",
+                "sort_value": 118.50
+            },
+            {
+                "carrier": "United Healthcare",
+                "type": "HMO",
+                "plan_name": "Gold HMO A",
+                "network": "Signature Value",
+                "monthly_premium": "$391.99",
+                "cost_per_period": "$118.50",
+                "sort_value": 118.50
+            },
+            {
+                "carrier": "Anthem Blue Cross",
+                "type": "PPO",
+                "plan_name": "Gold PPO B",
+                "network": "SelectPPO",
+                "monthly_premium": "$410.91",
+                "cost_per_period": "$127.40",
+                "sort_value": 127.40
+            }
         ]
+        # Sort quotes by cost per period
+        example_quotes.sort(key=lambda x: x["sort_value"])
         st.session_state.enrollment_data["quotes"] = example_quotes
         st.session_state.enrollment_step = 3
         st.rerun()
@@ -132,22 +194,60 @@ def show_plan_selection():
     data = st.session_state.enrollment_data
     st.write(f"Quote Reference: {data['quote_ref']}")
     
-    # Show available plans
+    # Show available plans in a grid
     st.subheader("Available Plans")
     plans = data.get("quotes", [])
     
-    for plan in plans:
-        with st.container():
-            col1, col2, col3 = st.columns([3, 1, 1])
-            with col1:
-                st.subheader(plan["plan"])
-                st.write(f"Monthly Premium: {plan['monthly_premium']}")
-                st.write(f"Annual Deductible: {plan['annual_deductible']}")
-            with col3:
-                if st.button("Select", key=plan["plan"]):
-                    st.session_state.enrollment_data["selected_plan"] = plan
-                    st.session_state.enrollment_step = 4
-                    st.rerun()
+    # Create a styled table header
+    col1, col2, col3, col4, col5, col6, col7 = st.columns([1.5, 1.5, 1, 1.5, 1.5, 1.5, 1])
+    with col1:
+        st.markdown("**Carrier**")
+    with col2:
+        st.markdown("**Plan Name**")
+    with col3:
+        st.markdown("**Type**")
+    with col4:
+        st.markdown("**Network**")
+    with col5:
+        st.markdown("**Monthly Premium**")
+    with col6:
+        st.markdown("**Your Cost/Period**")
+    with col7:
+        st.markdown("**Select**")
+    
+    # Add a separator
+    st.markdown("---")
+    
+    # Display each plan in the grid
+    for i, plan in enumerate(plans):
+        col1, col2, col3, col4, col5, col6, col7 = st.columns([1.5, 1.5, 1, 1.5, 1.5, 1.5, 1])
+        with col1:
+            st.write(f"**{plan['carrier']}**")
+        with col2:
+            st.write(plan['plan_name'])
+        with col3:
+            st.write(plan['type'])
+        with col4:
+            st.write(plan['network'])
+        with col5:
+            st.write(plan['monthly_premium'])
+        with col6:
+            st.write(plan['cost_per_period'])
+        with col7:
+            # Use a unique key by combining plan name and index
+            if st.button("Select", key=f"select_{i}_{plan['plan_name']}"):
+                st.session_state.enrollment_data["selected_plan"] = plan
+                st.session_state.enrollment_step = 4
+                st.rerun()
+        
+        # Add a light separator between plans
+        st.markdown("---")
+
+    # Add explanatory note
+    st.info("""
+    **Note:** Monthly premiums shown are prior to employer contribution. 
+    Your cost per pay period reflects your actual cost after the employer contribution.
+    """)
 
 def show_final_application():
     st.header("Step 4: Complete Application")
