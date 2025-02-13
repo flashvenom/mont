@@ -1,0 +1,56 @@
+/* Custom styles for the health insurance portal */
+.stButton button {
+    width: 100%;
+    border-radius: 5px;
+    height: 3em;
+    background-color: #4CAF50;
+    color: white;
+}
+
+.stButton button:hover {
+    background-color: #45a049;
+}
+
+/* Style for the plan selection containers */
+[data-testid="stHorizontalBlock"] {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 10px;
+    margin: 10px 0;
+    border: 1px solid #dee2e6;
+}
+
+/* Style for headers */
+h1, h2, h3 {
+    color: #2C3E50;
+}
+
+/* Style for the helpful links section */
+.streamlit-expanderHeader {
+    background-color: #e9ecef;
+    border-radius: 5px;
+}
+
+/* Style for form inputs */
+.stTextInput input, .stTextArea textarea, .stSelectbox select {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+}
+
+/* Style for success messages */
+.stSuccess {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 1rem;
+    border-radius: 5px;
+    border: 1px solid #c3e6cb;
+}
+
+/* Style for error messages */
+.stError {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 5px;
+    border: 1px solid #f5c6cb;
+} 
