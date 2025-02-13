@@ -3,6 +3,7 @@ import datetime
 import sys
 import uuid
 from pathlib import Path
+from db import save_application, save_quotes, get_db  # Add database functions
 
 # Add the parent directory to system path to import shared modules if needed
 sys.path.append(str(Path(__file__).parent.parent))
@@ -81,9 +82,11 @@ def show_initial_form():
         
         if submitted:
             if all([first_name, last_name, gender != "Select...", phone, location != "Select...", address]):
-                # Store the form data
-                quote_ref = str(uuid.uuid4())[:8]  # Generate a reference number
-                st.session_state.enrollment_data = {
+                # Generate quote reference
+                quote_ref = str(uuid.uuid4())[:8]
+                
+                # Prepare data for database
+                application_data = {
                     "quote_ref": quote_ref,
                     "first_name": first_name,
                     "last_name": last_name,
@@ -92,14 +95,15 @@ def show_initial_form():
                     "email": email,
                     "dob": dob,
                     "location": location,
-                    "address": address,
-                    "submission_date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    "address": address
                 }
                 
-                # Store in pending quotes
-                if 'pending_quotes' not in st.session_state:
-                    st.session_state.pending_quotes = {}
-                st.session_state.pending_quotes[quote_ref] = st.session_state.enrollment_data
+                # Save to database
+                application_id = save_application(application_data)
+                
+                # Store in session state for the next steps
+                st.session_state.enrollment_data = application_data
+                st.session_state.enrollment_data['id'] = application_id
                 
                 st.session_state.enrollment_step = 2
                 st.rerun()
@@ -201,8 +205,16 @@ def show_quote_processing():
                 "sort_value": 127.40
             }
         ]
+        
         # Sort quotes by cost per period
         example_quotes.sort(key=lambda x: x["sort_value"])
+        
+        # Save quotes to database
+        application_id = st.session_state.enrollment_data.get('id')
+        if application_id:
+            save_quotes(application_id, example_quotes)
+        
+        # Store in session state for next step
         st.session_state.enrollment_data["quotes"] = example_quotes
         st.session_state.enrollment_step = 3
         st.rerun()
@@ -433,6 +445,32 @@ def show_final_application():
         
         if submitted:
             if agree:
+                # Update application in database with final details
+                conn = get_db()
+                c = conn.cursor()
+                
+                application_id = st.session_state.enrollment_data.get('id')
+                if application_id:
+                    c.execute("""
+                        UPDATE applications 
+                        SET current_medications = ?,
+                            pre_existing_conditions = ?,
+                            ec_name = ?,
+                            ec_relationship = ?,
+                            ec_phone = ?,
+                            status = 'SUBMITTED'
+                        WHERE id = ?
+                    """, (
+                        current_medications,
+                        pre_existing_conditions,
+                        ec_name,
+                        ec_relationship,
+                        ec_phone,
+                        application_id
+                    ))
+                    conn.commit()
+                conn.close()
+                
                 st.success("""
                 Thank you for submitting your application! Our HR team will review your application
                 and contact you within 3-5 business days to finalize your enrollment.

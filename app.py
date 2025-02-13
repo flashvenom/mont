@@ -1,6 +1,10 @@
 import streamlit as st
+from db import init_db
 
 def main():
+    # Initialize the database
+    init_db()
+    
     st.set_page_config(
         page_title="My First Montessori - Health Insurance Portal",
         page_icon="🏥",
