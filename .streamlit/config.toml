@@ -1,0 +1,8 @@
+[browser]
+pageTitle = "Welcome"
+
+[client]
+toolbarTitle = "Welcome"
+
+[server]
+headless = true  # This will hide the navigation menu completely 
