@@ -283,9 +283,9 @@ def show_plan_selection():
         for col, header, tooltip in zip(cols, headers, tooltips):
             with col:
                 if tooltip:
-                    st.markdown(f"<div title='{tooltip}'>**{header}**</div>", unsafe_allow_html=True)
+                    st.write(f"**{header}**")
                 else:
-                    st.markdown(f"**{header}**")
+                    st.write(f"**{header}**")
         
         # Add a separator
         st.markdown("---")
@@ -298,6 +298,12 @@ def show_plan_selection():
                 
             cols = st.columns([1.2, 1.2, 0.8, 0.8, 1, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8])
             
+            # Function to clean currency values
+            def clean_amount(amount):
+                if isinstance(amount, str):
+                    return amount.replace('$', '')
+                return amount
+            
             # Row 1: Basic Info
             with cols[0]:
                 st.write(plan['carrier'])
@@ -308,21 +314,21 @@ def show_plan_selection():
             with cols[3]:
                 st.write(plan['network'])
             with cols[4]:
-                st.write(plan['monthly_premium'])
+                st.write(clean_amount(plan['monthly_premium']))
             with cols[5]:
-                st.write(plan['cost_per_period'])
+                st.write(clean_amount(plan['cost_per_period']))
             with cols[6]:
-                st.write(details['deductible'])
+                st.write(clean_amount(details['deductible']))
             with cols[7]:
-                st.write(details['doc_visit'])
+                st.write(clean_amount(details['doc_visit']))
             with cols[8]:
                 st.write(details['hospital'])
             with cols[9]:
-                st.write(details['urgent_care'])
+                st.write(clean_amount(details['urgent_care']))
             with cols[10]:
-                st.write(details['rx'])
+                st.write(clean_amount(details['rx']))
             with cols[11]:
-                st.write(details['out_of_pocket'])
+                st.write(clean_amount(details['out_of_pocket']))
             
             # Add select button below the row
             cols = st.columns([11, 1])
