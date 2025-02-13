@@ -16,27 +16,8 @@ def show_enrollment_form():
         st.session_state.enrollment_step = 1
     if 'enrollment_data' not in st.session_state:
         st.session_state.enrollment_data = {}
-
-    # If coming from "Pick a Plan" button on homepage
-    if st.session_state.enrollment_step == 3 and not st.session_state.get('current_quote'):
-        st.header("Enter Your Quote Reference Number")
-        
-        quote_ref = st.text_input("Quote Reference Number")
-        if st.button("Access Quote"):
-            if quote_ref in st.session_state.pending_quotes:
-                st.session_state.current_quote = st.session_state.pending_quotes[quote_ref]
-                st.session_state.enrollment_data = st.session_state.current_quote
-                st.rerun()
-            else:
-                st.error("Quote not found. Please check your reference number.")
-        
-        # Add option to go back or start new enrollment
-        st.markdown("---")
-        if st.button("← Back to Homepage"):
-            st.session_state.enrollment_step = 1
-            st.switch_page("app.py")
-        
-        return
+    if 'pending_quotes' not in st.session_state:
+        st.session_state.pending_quotes = {}
 
     # Show progress
     progress_text = ["Basic Information", "Quote Processing", "Plan Selection", "Final Application"]

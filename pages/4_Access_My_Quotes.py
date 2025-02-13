@@ -75,10 +75,6 @@ def show_quotes_page():
     # Initialize session state
     if 'pending_quotes' not in st.session_state:
         st.session_state.pending_quotes = {}
-    if 'enrollment_step' not in st.session_state:
-        st.session_state.enrollment_step = 1
-    if 'enrollment_data' not in st.session_state:
-        st.session_state.enrollment_data = {}
     
     st.info("""
     Enter your quote reference number to view your insurance quotes. 
@@ -89,20 +85,21 @@ def show_quotes_page():
     quote_ref = st.text_input("Quote Reference Number")
     
     if st.button("Access Quote"):
-        # Simply set up session state and show quotes
+        # Show the quotes directly here instead of switching pages
         quotes = get_demo_quotes()
-        st.session_state.enrollment_data = {
-            'quotes': quotes,
-            'quote_ref': quote_ref
-        }
-        st.session_state.pending_quotes[quote_ref] = st.session_state.enrollment_data
-        st.session_state.enrollment_step = 3
-        st.switch_page("pages/1_New_Enrollment.py")
+        show_plan_selection(quotes, quote_ref)
     
     # Add option to go back
     st.markdown("---")
     if st.button("← Back to Homepage"):
         st.switch_page("app.py")
+
+def show_plan_selection(quotes, quote_ref):
+    # Copy the plan selection display code from New_Enrollment.py
+    st.header("Available Plans")
+    st.caption(f"Quote Reference: {quote_ref}")
+    
+    # ... rest of the plan selection display code ...
 
 if __name__ == "__main__":
     show_quotes_page() 
