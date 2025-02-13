@@ -1,6 +1,7 @@
 import streamlit as st
 import datetime
 import sys
+import uuid
 from pathlib import Path
 
 # Add the parent directory to system path to import shared modules if needed
@@ -12,6 +13,8 @@ def show_enrollment_form():
     # Initialize session state if not already done
     if 'enrollment_step' not in st.session_state:
         st.session_state.enrollment_step = 1
+    if 'enrollment_data' not in st.session_state:
+        st.session_state.enrollment_data = {}
 
     # Show progress
     progress_text = ["Basic Information", "Quote Processing", "Plan Selection", "Final Application"]
@@ -23,7 +26,7 @@ def show_enrollment_form():
     if st.session_state.enrollment_step == 1:
         show_initial_form()
     elif st.session_state.enrollment_step == 2:
-        show_waiting_page()
+        show_quote_processing()
     elif st.session_state.enrollment_step == 3:
         show_plan_selection()
     elif st.session_state.enrollment_step == 4:
@@ -57,60 +60,92 @@ def show_initial_form():
         
         if submitted:
             if all([first_name, last_name, gender != "Select...", phone, location != "Select...", address]):
+                # Store the form data
+                quote_ref = str(uuid.uuid4())[:8]  # Generate a reference number
+                st.session_state.enrollment_data = {
+                    "quote_ref": quote_ref,
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "gender": gender,
+                    "phone": phone,
+                    "email": email,
+                    "dob": dob,
+                    "location": location,
+                    "address": address,
+                    "submission_date": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
+                
+                # Store in pending quotes
+                if 'pending_quotes' not in st.session_state:
+                    st.session_state.pending_quotes = {}
+                st.session_state.pending_quotes[quote_ref] = st.session_state.enrollment_data
+                
                 st.session_state.enrollment_step = 2
                 st.rerun()
             else:
                 st.error("Please fill in all required fields.")
 
-def show_waiting_page():
+def show_quote_processing():
     st.header("Step 2: Quote Processing")
-    st.info("""
+    
+    # Display the stored information
+    st.subheader("Information Submitted")
+    data = st.session_state.enrollment_data
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.write("**Name:**", f"{data['first_name']} {data['last_name']}")
+        st.write("**Gender:**", data['gender'])
+        st.write("**Phone:**", data['phone'])
+        st.write("**Email:**", data['email'])
+    
+    with col2:
+        st.write("**Date of Birth:**", data['dob'].strftime("%Y-%m-%d"))
+        st.write("**Location:**", data['location'])
+        st.write("**Address:**", data['address'])
+    
+    st.info(f"""
+    Your quote reference number is: **{data['quote_ref']}**
+    
+    Please save this number. You can use it on the homepage to access your quote once it's ready.
+    
     Your information has been submitted for a quote. Please expect an email within 1-2 business days
-    with your personalized quote information. Once you receive the email, return to this portal to
-    continue with plan selection.
+    with your personalized quote information.
     """)
     
-    if st.button("I've received my quote email"):
+    # For demo purposes, we'll add some example quotes
+    if st.button("Demo: Generate Quote Now"):
+        example_quotes = [
+            {"plan": "Basic Plan", "monthly_premium": "$200", "annual_deductible": "$2000"},
+            {"plan": "Standard Plan", "monthly_premium": "$300", "annual_deductible": "$1000"},
+            {"plan": "Premium Plan", "monthly_premium": "$400", "annual_deductible": "$500"}
+        ]
+        st.session_state.enrollment_data["quotes"] = example_quotes
         st.session_state.enrollment_step = 3
         st.rerun()
 
 def show_plan_selection():
     st.header("Step 3: Select Your Plan")
     
-    plans = [
-        {
-            "name": "Basic Plan",
-            "monthly_premium": "$200",
-            "deductible": "$2000",
-            "coverage": "80%"
-        },
-        {
-            "name": "Standard Plan",
-            "monthly_premium": "$300",
-            "deductible": "$1000",
-            "coverage": "90%"
-        },
-        {
-            "name": "Premium Plan",
-            "monthly_premium": "$400",
-            "deductible": "$500",
-            "coverage": "95%"
-        }
-    ]
+    # Display stored information
+    st.subheader("Your Information")
+    data = st.session_state.enrollment_data
+    st.write(f"Quote Reference: {data['quote_ref']}")
     
-    selected_plan = None
+    # Show available plans
+    st.subheader("Available Plans")
+    plans = data.get("quotes", [])
     
     for plan in plans:
         with st.container():
             col1, col2, col3 = st.columns([3, 1, 1])
             with col1:
-                st.subheader(plan["name"])
+                st.subheader(plan["plan"])
                 st.write(f"Monthly Premium: {plan['monthly_premium']}")
-                st.write(f"Deductible: {plan['deductible']}")
-                st.write(f"Coverage: {plan['coverage']}")
+                st.write(f"Annual Deductible: {plan['annual_deductible']}")
             with col3:
-                if st.button("Select", key=plan["name"]):
-                    selected_plan = plan["name"]
+                if st.button("Select", key=plan["plan"]):
+                    st.session_state.enrollment_data["selected_plan"] = plan
                     st.session_state.enrollment_step = 4
                     st.rerun()
 

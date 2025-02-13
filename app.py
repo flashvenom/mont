@@ -9,6 +9,20 @@ def main():
 
     st.title("Welcome to My First Montessori Health Insurance Portal")
     
+    # Check for quotes in session state
+    if 'pending_quotes' not in st.session_state:
+        st.session_state.pending_quotes = {}  # Dict to store quotes by employee ID
+    
+    # Quote notification section
+    with st.expander("Have a Quote? Enter Your Reference Number", expanded=True):
+        quote_ref = st.text_input("Quote Reference Number")
+        if st.button("Access My Quote"):
+            if quote_ref in st.session_state.pending_quotes:
+                st.session_state.current_quote = st.session_state.pending_quotes[quote_ref]
+                st.switch_page("pages/1_New_Enrollment.py")
+            else:
+                st.error("Quote not found. Please check your reference number.")
+    
     st.markdown("""
     ## How can we help you today?
     
