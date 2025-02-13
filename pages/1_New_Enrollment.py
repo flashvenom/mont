@@ -4,6 +4,7 @@ import sys
 import uuid
 from pathlib import Path
 from db import save_application, save_quotes, get_db  # Add database functions
+from components.chat import show_chat_section
 
 # Add the parent directory to system path to import shared modules if needed
 sys.path.append(str(Path(__file__).parent.parent))
@@ -34,6 +35,9 @@ def show_enrollment_form():
         show_plan_selection()
     elif st.session_state.enrollment_step == 4:
         show_final_application()
+    
+    # Add chat section at the bottom of the page
+    show_chat_section()
 
 def show_initial_form():
     st.header("Step 1: Basic Information")

@@ -1,5 +1,8 @@
 import streamlit as st
 from db import init_db
+from dotenv import load_dotenv
+
+load_dotenv()  # Add this at the top of app.py
 
 def main():
     # Initialize the database
