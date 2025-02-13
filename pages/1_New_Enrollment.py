@@ -218,8 +218,69 @@ def show_plan_selection():
     # Add a separator
     st.markdown("---")
     
+    # Coverage details for each plan
+    coverage_details = {
+        "Silver HMO D": {
+            "deductible": "$2,700 / $3,000 / $5,400",
+            "doc_visit": "75%",
+            "hospital": "75%",
+            "urgent_care": "75%",
+            "rx": "Very Limited",
+            "out_of_pocket": "$7,200/$14,000"
+        },
+        "Silver HMO C": {
+            "deductible": "$2,500/$5,000",
+            "doc_visit": "$55",
+            "hospital": "60%",
+            "urgent_care": "$55",
+            "rx": "$19",
+            "out_of_pocket": "$8,750/$17,500"
+        },
+        "Silver HMO B": {
+            "deductible": "$1,900/$3,800",
+            "doc_visit": "$65",
+            "hospital": "55%",
+            "urgent_care": "$65",
+            "rx": "$20",
+            "out_of_pocket": "$8,750/$17,500"
+        },
+        "Gold HMO B": {
+            "deductible": "$1,500/$3,000",
+            "doc_visit": "$35",
+            "hospital": "70%",
+            "urgent_care": "$100",
+            "rx": "$15",
+            "out_of_pocket": "$8,500/$17,000"
+        },
+        "Gold HMO B": {  # Kaiser version
+            "deductible": "$250/$500",
+            "doc_visit": "$35",
+            "hospital": "$600",
+            "urgent_care": "$35",
+            "rx": "$15",
+            "out_of_pocket": "$7,800/$15,600"
+        },
+        "Gold HMO A": {
+            "deductible": "None",
+            "doc_visit": "$30",
+            "hospital": "$750",
+            "urgent_care": "$50",
+            "rx": "Not specified",
+            "out_of_pocket": "$7,000/$14,000"
+        },
+        "Gold PPO B": {
+            "deductible": "$1,000/$3,000",
+            "doc_visit": "$25",
+            "hospital": "75%",
+            "urgent_care": "$25",
+            "rx": "$10",
+            "out_of_pocket": "$7,800/$15,600"
+        }
+    }
+    
     # Display each plan in the grid
     for i, plan in enumerate(plans):
+        # Basic plan information
         col1, col2, col3, col4, col5, col6, col7 = st.columns([1.5, 1.5, 1, 1.5, 1.5, 1.5, 1])
         with col1:
             st.write(f"**{plan['carrier']}**")
@@ -234,19 +295,36 @@ def show_plan_selection():
         with col6:
             st.write(plan['cost_per_period'])
         with col7:
-            # Use a unique key by combining plan name and index
             if st.button("Select", key=f"select_{i}_{plan['plan_name']}"):
                 st.session_state.enrollment_data["selected_plan"] = plan
                 st.session_state.enrollment_step = 4
                 st.rerun()
         
+        # Coverage details in expandable section
+        details = coverage_details.get(plan['plan_name'])
+        if details:
+            with st.expander("View Plan Details"):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.write("**Deductible:**", details['deductible'])
+                    st.write("**Doctor Visit:**", details['doc_visit'])
+                with col2:
+                    st.write("**Hospital:**", details['hospital'])
+                    st.write("**Urgent Care:**", details['urgent_care'])
+                with col3:
+                    st.write("**Prescription:**", details['rx'])
+                    st.write("**Out-of-Pocket Max:**", details['out_of_pocket'])
+        
         # Add a light separator between plans
         st.markdown("---")
 
-    # Add explanatory note
+    # Add explanatory notes
     st.info("""
-    **Note:** Monthly premiums shown are prior to employer contribution. 
-    Your cost per pay period reflects your actual cost after the employer contribution.
+    **Notes:** 
+    - Monthly premiums shown are prior to employer contribution
+    - Your cost per pay period reflects your actual cost after the employer contribution
+    - Deductible amounts shown as Individual/Family
+    - Out-of-Pocket Maximum shown as Individual/Family
     """)
 
 def show_final_application():
