@@ -3,51 +3,75 @@ import streamlit as st
 def show_changes_page():
     st.title("Make Changes to Your Insurance")
     
-    # Authentication section
-    st.header("Please Verify Your Identity")
+    # Initialize session state if needed
+    if 'change_step' not in st.session_state:
+        st.session_state.change_step = 1
     
-    with st.form("auth_form"):
-        employee_id = st.text_input("Employee ID")
-        dob = st.date_input("Date of Birth")
-        submitted = st.form_submit_button("Verify Identity")
-        
-        if submitted:
-            # In a real app, you would verify these credentials
-            st.session_state.authenticated = True
-            st.rerun()
+    # List of all available plans
+    plans = [
+        "Kaiser Silver HMO D",
+        "Kaiser Silver HMO C",
+        "Kaiser Silver HMO B",
+        "United Healthcare Gold HMO B",
+        "Kaiser Gold HMO B",
+        "United Healthcare Gold HMO A",
+        "Anthem Blue Cross Gold PPO B"
+    ]
     
-    if 'authenticated' in st.session_state and st.session_state.authenticated:
-        st.header("Select Changes")
+    if st.session_state.change_step == 1:
+        st.header("Which plan are you currently on?")
         
-        change_type = st.radio(
-            "What would you like to change?",
-            ["Update Personal Information", "Change Insurance Plan", "Update Dependents", "Cancel Coverage"]
+        # Create two columns for better layout
+        col1, col2 = st.columns(2)
+        
+        # Split plans between columns
+        mid_point = len(plans) // 2 + len(plans) % 2
+        
+        with col1:
+            for plan in plans[:mid_point]:
+                if st.button(plan, key=f"btn_{plan}", use_container_width=True):
+                    st.session_state.selected_plan = plan
+                    st.session_state.change_step = 2
+                    st.rerun()
+                st.write("")  # Add some spacing between buttons
+        
+        with col2:
+            for plan in plans[mid_point:]:
+                if st.button(plan, key=f"btn_{plan}", use_container_width=True):
+                    st.session_state.selected_plan = plan
+                    st.session_state.change_step = 2
+                    st.rerun()
+                st.write("")  # Add some spacing between buttons
+    
+    elif st.session_state.change_step == 2:
+        st.header("Your Change Request Form Is Here:")
+        
+        # Display selected plan
+        st.write(f"Current Plan: **{st.session_state.selected_plan}**")
+        
+        # Create a download button for the form
+        # Note: In a real application, you would generate a specific form based on the plan
+        st.download_button(
+            label="📄 Download Change Request Form",
+            data=b"Placeholder for actual form data",  # Replace with actual form data
+            file_name="change_request_form.pdf",
+            mime="application/pdf"
         )
         
-        if change_type == "Update Personal Information":
-            show_personal_info_form()
-        elif change_type == "Change Insurance Plan":
-            show_plan_change_form()
-        elif change_type == "Update Dependents":
-            show_dependents_form()
-        elif change_type == "Cancel Coverage":
-            show_cancellation_form()
-
-def show_personal_info_form():
-    st.subheader("Update Personal Information")
-    # Add form fields for personal information updates
-    
-def show_plan_change_form():
-    st.subheader("Change Insurance Plan")
-    # Add form fields for plan changes
-    
-def show_dependents_form():
-    st.subheader("Update Dependents")
-    # Add form fields for dependent updates
-    
-def show_cancellation_form():
-    st.subheader("Cancel Coverage")
-    # Add form fields for coverage cancellation
+        # Add some helpful instructions
+        st.info("""
+        **Next Steps:**
+        1. Download and complete the form
+        2. Submit the completed form to HR
+        3. Allow 3-5 business days for processing
+        
+        For assistance, contact HR at hr@myfirstmontessori.com
+        """)
+        
+        # Add a button to start over
+        if st.button("← Select Different Plan"):
+            st.session_state.change_step = 1
+            st.rerun()
 
 if __name__ == "__main__":
     show_changes_page() 
