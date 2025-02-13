@@ -155,7 +155,7 @@ def show_quote_processing():
             {
                 "carrier": "Kaiser Permanente",
                 "type": "HMO",
-                "plan_name": "Gold HMO B",
+                "plan_name": "Gold HMO B_Kaiser",
                 "network": "Full",
                 "monthly_premium": "$391.99",
                 "cost_per_period": "$118.50",
@@ -190,38 +190,13 @@ def show_plan_selection():
     st.header("Step 3: Select Your Plan")
     
     # Display stored information
-    st.subheader("Your Information")
     data = st.session_state.enrollment_data
-    st.write(f"Quote Reference: {data['quote_ref']}")
+    st.caption(f"Quote Reference: {data['quote_ref']}")
     
-    # Show available plans in a grid
-    st.subheader("Available Plans")
-    plans = data.get("quotes", [])
-    
-    # Create a styled table header
-    col1, col2, col3, col4, col5, col6, col7 = st.columns([1.5, 1.5, 1, 1.5, 1.5, 1.5, 1])
-    with col1:
-        st.markdown("**Carrier**")
-    with col2:
-        st.markdown("**Plan Name**")
-    with col3:
-        st.markdown("**Type**")
-    with col4:
-        st.markdown("**Network**")
-    with col5:
-        st.markdown("**Monthly Premium**")
-    with col6:
-        st.markdown("**Your Cost/Period**")
-    with col7:
-        st.markdown("**Select**")
-    
-    # Add a separator
-    st.markdown("---")
-    
-    # Coverage details for each plan
+    # Coverage details dictionary
     coverage_details = {
         "Silver HMO D": {
-            "deductible": "$2,700 / $3,000 / $5,400",
+            "deductible": "$2,700/$3,000/$5,400",
             "doc_visit": "75%",
             "hospital": "75%",
             "urgent_care": "75%",
@@ -244,7 +219,7 @@ def show_plan_selection():
             "rx": "$20",
             "out_of_pocket": "$8,750/$17,500"
         },
-        "Gold HMO B": {
+        "Gold HMO B": {  # United Healthcare version
             "deductible": "$1,500/$3,000",
             "doc_visit": "$35",
             "hospital": "70%",
@@ -252,7 +227,7 @@ def show_plan_selection():
             "rx": "$15",
             "out_of_pocket": "$8,500/$17,000"
         },
-        "Gold HMO B": {  # Kaiser version
+        "Gold HMO B_Kaiser": {  # Kaiser version - using a unique key
             "deductible": "$250/$500",
             "doc_visit": "$35",
             "hospital": "$600",
@@ -277,54 +252,134 @@ def show_plan_selection():
             "out_of_pocket": "$7,800/$15,600"
         }
     }
+
+    # Show available plans in a grid
+    st.subheader("Available Plans")
+    plans = data.get("quotes", [])
     
-    # Display each plan in the grid
-    for i, plan in enumerate(plans):
-        # Basic plan information
-        col1, col2, col3, col4, col5, col6, col7 = st.columns([1.5, 1.5, 1, 1.5, 1.5, 1.5, 1])
-        with col1:
-            st.write(f"**{plan['carrier']}**")
-        with col2:
-            st.write(plan['plan_name'])
-        with col3:
-            st.write(plan['type'])
-        with col4:
-            st.write(plan['network'])
-        with col5:
-            st.write(plan['monthly_premium'])
-        with col6:
-            st.write(plan['cost_per_period'])
-        with col7:
-            if st.button("Select", key=f"select_{i}_{plan['plan_name']}"):
-                st.session_state.enrollment_data["selected_plan"] = plan
-                st.session_state.enrollment_step = 4
-                st.rerun()
+    # Check if on mobile (streamlit provides this through st.session_state)
+    is_mobile = False  # You can implement actual mobile detection if needed
+    
+    if not is_mobile:
+        # Create a styled table header for desktop view
+        cols = st.columns([1.2, 1.2, 0.8, 0.8, 1, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8])
+        headers = [
+            "Carrier", "Plan", "Type", "Network", "Monthly", "Your Cost", 
+            "Deduct.", "Doc", "Hosp.", "Urgent", "Rx", "OOP"
+        ]
+        tooltips = [
+            None, None, None, None, 
+            "Monthly Premium (before employer contribution)",
+            "Your cost per pay period (after employer contribution)",
+            "Deductible (Individual/Family)",
+            "Doctor Visit Cost",
+            "Hospital Coverage",
+            "Urgent Care Cost",
+            "Prescription Drug Cost",
+            "Out-of-Pocket Maximum (Individual/Family)"
+        ]
         
-        # Coverage details in expandable section
-        details = coverage_details.get(plan['plan_name'])
-        if details:
-            with st.expander("View Plan Details"):
-                col1, col2, col3 = st.columns(3)
+        # Display headers with tooltips
+        for col, header, tooltip in zip(cols, headers, tooltips):
+            with col:
+                if tooltip:
+                    st.markdown(f"<div title='{tooltip}'>**{header}**</div>", unsafe_allow_html=True)
+                else:
+                    st.markdown(f"**{header}**")
+        
+        # Add a separator
+        st.markdown("---")
+        
+        # Display each plan in the grid
+        for i, plan in enumerate(plans):
+            details = coverage_details.get(plan['plan_name'])
+            if not details:
+                continue
+                
+            cols = st.columns([1.2, 1.2, 0.8, 0.8, 1, 1, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8])
+            
+            # Row 1: Basic Info
+            with cols[0]:
+                st.write(plan['carrier'])
+            with cols[1]:
+                st.write(plan['plan_name'])
+            with cols[2]:
+                st.write(plan['type'])
+            with cols[3]:
+                st.write(plan['network'])
+            with cols[4]:
+                st.write(plan['monthly_premium'])
+            with cols[5]:
+                st.write(plan['cost_per_period'])
+            with cols[6]:
+                st.write(details['deductible'])
+            with cols[7]:
+                st.write(details['doc_visit'])
+            with cols[8]:
+                st.write(details['hospital'])
+            with cols[9]:
+                st.write(details['urgent_care'])
+            with cols[10]:
+                st.write(details['rx'])
+            with cols[11]:
+                st.write(details['out_of_pocket'])
+            
+            # Add select button below the row
+            cols = st.columns([11, 1])
+            with cols[1]:
+                if st.button("Select", key=f"select_{i}_{plan['plan_name']}"):
+                    st.session_state.enrollment_data["selected_plan"] = plan
+                    st.session_state.enrollment_step = 4
+                    st.rerun()
+            
+            # Add a light separator between plans
+            st.markdown("---")
+    
+    else:
+        # Mobile view - show cards instead of grid
+        for i, plan in enumerate(plans):
+            details = coverage_details.get(plan['plan_name'])
+            if not details:
+                continue
+                
+            with st.container():
+                st.subheader(f"{plan['carrier']} - {plan['plan_name']}")
+                col1, col2 = st.columns(2)
+                
                 with col1:
+                    st.write("**Type:**", plan['type'])
+                    st.write("**Network:**", plan['network'])
+                    st.write("**Monthly Premium:**", plan['monthly_premium'])
+                    st.write("**Your Cost:**", plan['cost_per_period'])
+                
+                with col2:
                     st.write("**Deductible:**", details['deductible'])
                     st.write("**Doctor Visit:**", details['doc_visit'])
-                with col2:
                     st.write("**Hospital:**", details['hospital'])
                     st.write("**Urgent Care:**", details['urgent_care'])
-                with col3:
-                    st.write("**Prescription:**", details['rx'])
-                    st.write("**Out-of-Pocket Max:**", details['out_of_pocket'])
-        
-        # Add a light separator between plans
-        st.markdown("---")
+                    st.write("**Rx:**", details['rx'])
+                    st.write("**OOP Max:**", details['out_of_pocket'])
+                
+                if st.button("Select", key=f"select_{i}_{plan['plan_name']}"):
+                    st.session_state.enrollment_data["selected_plan"] = plan
+                    st.session_state.enrollment_step = 4
+                    st.rerun()
+                
+                st.markdown("---")
 
     # Add explanatory notes
     st.info("""
+    **Abbreviations:**
+    - OOP = Out-of-Pocket Maximum
+    - Rx = Prescription Drugs
+    - Deduct. = Deductible
+    - Doc = Doctor Visit
+    - Hosp. = Hospital Coverage
+    
     **Notes:** 
     - Monthly premiums shown are prior to employer contribution
     - Your cost per pay period reflects your actual cost after the employer contribution
-    - Deductible amounts shown as Individual/Family
-    - Out-of-Pocket Maximum shown as Individual/Family
+    - Deductible and Out-of-Pocket Maximum amounts shown as Individual/Family
     """)
 
 def show_final_application():
