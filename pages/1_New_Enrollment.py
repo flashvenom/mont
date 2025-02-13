@@ -434,7 +434,7 @@ def show_final_application():
         ec_phone = st.text_input("Emergency Contact Phone")
         
         # Terms and conditions
-        agree = st.checkbox("I confirm that all information provided is accurate and complete")
+        agree = st.checkbox("I confirm that all information provided is accurate and complete. I understand that I must wet-ink sign a pre-filled formal application which I can will print (DOWNLOAD LINK) and bring to HR the next time I come in to the school")
         
         submitted = st.form_submit_button("Submit Application")
         

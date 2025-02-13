@@ -227,6 +227,12 @@ def show_plan_selection(quotes, quote_ref):
         with cols[11]:
             st.write(clean_amount(details['out_of_pocket']))
         
+        # Add select button below the row
+        cols = st.columns([11, 1])
+        with cols[1]:
+            if st.button("Select", key=f"select_{i}_{plan['plan_name']}"):
+                st.switch_page("pages/1_New_Enrollment.py")
+        
         # Add a light separator between plans
         st.markdown("---")
 
