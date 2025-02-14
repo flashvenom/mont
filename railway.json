@@ -1,8 +1,9 @@
 {
-    "build": {
-      "builder": "NIXPACKS",
-      "nixpacksConfig": {
-        "start": "streamlit run app.py --server.port $PORT"
-      }
-    }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "streamlit run app.py --server.port $PORT"
   }
+}
