@@ -26,7 +26,7 @@ def show_chat_section():
 
         # Get AI response
         try:
-            client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+            client = OpenAI(api_key="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")
             
             system_prompt = """You are a friendly and supportive chat assistant for the 'Metro-Montessori Group Medical Assistance App.' Your primary goal is to guide Montessori employees through selecting or changing their medical plan, explaining coverage details, and answering other health insurance-related questions. Please be clear, approachable, and use simple language to help them understand their options.
 
