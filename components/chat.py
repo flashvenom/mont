@@ -24,7 +24,7 @@ def show_chat_section():
         with st.chat_message("user"):
             st.write(prompt)
 
-        # Get AI response
+        # Get AI response!
         try:
             client = OpenAI(api_key="")
             
