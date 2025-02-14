@@ -1,6 +1,7 @@
 import streamlit as st
 from db import init_db
 from dotenv import load_dotenv
+from components.chat import show_chat_section
 
 load_dotenv()  # Add this at the top of app.py
 
@@ -78,6 +79,9 @@ def main():
     **Important Notice**: Open enrollment period is from October 1st to December 15th. 
     Changes outside this period require a qualifying life event.
     """)
+
+    # Add chat section at the bottom of the homepage
+    show_chat_section()
 
 if __name__ == "__main__":
     main() 
