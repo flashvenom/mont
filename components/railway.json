@@ -1,0 +1,8 @@
+{
+    "build": {
+      "builder": "NIXPACKS",
+      "nixpacksConfig": {
+        "start": "streamlit run app.py --server.port $PORT"
+      }
+    }
+  }
