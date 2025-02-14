@@ -3,7 +3,6 @@ import os
 from openai import OpenAI
 
 def show_chat_section():
-    st.markdown("---")
     st.subheader("💬 Ask a Question")
     
     # Initialize chat history in session state if not present

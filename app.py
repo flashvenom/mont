@@ -54,7 +54,6 @@ def main():
             st.switch_page("pages/3_Resources.py")
 
     # Quick Links Section
-    st.markdown("---")
     st.markdown("### Quick Links")
     
     quick_links_col1, quick_links_col2 = st.columns(2)
@@ -74,7 +73,6 @@ def main():
         """)
 
     # Important Notices
-    st.markdown("---")
     st.info("""
     **Important Notice**: Open enrollment period is from October 1st to December 15th. 
     Changes outside this period require a qualifying life event.
