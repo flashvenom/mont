@@ -5,7 +5,20 @@ from db import get_all_applications, get_db
 def show_admin_dashboard():
     st.title("Admin Dashboard")
     
-    # Tabs for different views
+    # Password protection
+    if 'admin_authenticated' not in st.session_state:
+        st.session_state.admin_authenticated = False
+    
+    if not st.session_state.admin_authenticated:
+        password = st.text_input("Enter admin password:", type="password")
+        if password == "tom":
+            st.session_state.admin_authenticated = True
+            st.rerun()
+        elif password:  # Only show error if they've tried to enter a password
+            st.error("Incorrect password")
+        return  # Don't show admin content until authenticated
+    
+    # Rest of the admin dashboard code
     tab1, tab2 = st.tabs(["Applications", "Quotes"])
     
     with tab1:
