@@ -9,13 +9,14 @@ def show_changes_page():
     
     # List of all available plans
     plans = [
-        "Kaiser Silver HMO D",
-        "Kaiser Silver HMO C",
-        "Kaiser Silver HMO B",
-        "United Healthcare Gold HMO B",
-        "Kaiser Gold HMO B",
-        "United Healthcare Gold HMO A",
-        "Anthem Blue Cross Gold PPO B"
+        "Kaiser (SILVER HMO D)",
+        "Kaiser (SILVER HMO C)",
+        "Kaiser (SILVER HMO B)",
+        "Kaiser (GOLD HMO B)",
+        "United Healthcare (GOLD HMO B)",
+        "United Healthcare (GOLD HMO A)",
+        "Anthem Blue Cross (GOLD PPO B)",
+        "Anthem Blue Cross (SILVER HMO C"
     ]
     
     if st.session_state.change_step == 1:

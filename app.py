@@ -15,7 +15,7 @@ def main():
         layout="wide"
     )
 
-    st.title("Welcome to the Metro/Montessori Health Insurance Portal")
+    st.title("My First Montessori Health Insurance Center")
     
     # Initialize quotes in session state if not already done
     if 'pending_quotes' not in st.session_state:
@@ -30,28 +30,29 @@ def main():
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
+        st.warning("### My Benefits")
+        st.write("View or change your existing health insurance benefits plan.")
+        if st.button("Make Changes", key="changes"):
+            st.switch_page("pages/2_Make_Changes.py")
+
+    with col2:
+        st.success("### Resources")
+        st.write("Access helpful resources, contacts and documentation.")
+        if st.button("View Resources", key="resources"):
+            st.switch_page("pages/3_Resources.py")
+
+    with col3:
         st.info("### New Enrollment")
         st.write("Start a new health insurance enrollment application.")
         if st.button("Start New Enrollment", key="new"):
             st.switch_page("pages/1_New_Enrollment.py")
 
-    with col2:
-        st.warning("### Make Changes")
-        st.write("Update your existing health insurance plan or information.")
-        if st.button("Make Changes", key="changes"):
-            st.switch_page("pages/2_Make_Changes.py")
-
-    with col3:
+    with col4:
         st.info("### Access My Quotes")
         st.write("View and select from your available quotes.")
         if st.button("Access Quotes", key="quotes"):
             st.switch_page("pages/4_Access_My_Quotes.py")
             
-    with col4:
-        st.success("### Resources")
-        st.write("Access helpful resources and documentation.")
-        if st.button("View Resources", key="resources"):
-            st.switch_page("pages/3_Resources.py")
 
     # Quick Links Section
     st.markdown("### Quick Links")
@@ -60,16 +61,14 @@ def main():
     
     with quick_links_col1:
         st.markdown("""
-        * [Understanding Your Benefits](https://example.com/benefits)
-        * [Find a Healthcare Provider](https://example.com/providers)
-        * [Contact HR Department](mailto:hr@myfirstmontessori.com)
+        * [Find a Healthcare Provider](https://www.blueshieldca.com/fad/home)
+        * [Contact HR Department](mailto:wendy@myfirstmontessori.com)
         """)
     
     with quick_links_col2:
         st.markdown("""
-        * [Insurance Terms Glossary](https://www.healthcare.gov/glossary/)
-        * [FAQ](https://example.com/faq)
-        * [Emergency Contact Information](https://example.com/emergency)
+        * [Insurance Terms Glossary](http://files.metroinsurance.com/pdf/sbc/2025/glossary.pdf)
+        * [Emergency Contact Information](mailto:wendy@myfirstmontessori.com)
         """)
 
     # Important Notices
